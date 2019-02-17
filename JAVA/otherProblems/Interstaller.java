@@ -50,7 +50,7 @@ public class Interstaller {
 					weights[i] = dis + map[k][i];
 				}
 			}
-			print(weights);
+			// print(weights);
 		}
 
 		return weights[endpoint];
@@ -77,7 +77,7 @@ public class Interstaller {
 
 	public static void main(String[] args) throws FileNotFoundException {
 		long startTime = System.currentTimeMillis();
-		Scanner sc = new Scanner(new FileInputStream("test1.txt"));
+		Scanner sc = new Scanner(new FileInputStream("test.txt"));
 		int testcase = sc.nextInt();
 		for (int i = 1; i <= testcase; i++) {
 			int wormholes = sc.nextInt();
