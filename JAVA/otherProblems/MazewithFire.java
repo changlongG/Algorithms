@@ -1,17 +1,24 @@
 package algorithm;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
+
 public class MazewithFire {
-	private MazePoint[][] map;
+	private static MazePoint[][] map;
 	MyQueue<MazePoint> queue = new MyQueue();
+	static int[][] direction = { { 0, 1 }, { 0, -1 }, { 1, 0 }, { -1, 0 } };
 
 	public MazewithFire(int[][] map) {
 		this.map = new MazePoint[map.length][map[0].length];
 		for (int i = 0; i < map.length; i++) {
 			for (int j = 0; j < map[0].length; j++) {
 				this.map[i][j] = new MazePoint(i, j, map[i][j]);
+				if (map[i][j] == 2) {
+					this.map[i][j].setFiretime(0);
+				}
 			}
 		}
-
 	}
 
 	public boolean isMazePoint(int x, int y) {
@@ -24,79 +31,42 @@ public class MazewithFire {
 
 	public void firebfs() {
 		while (!queue.isEmpty()) {
-
 			MazePoint mp = queue.poll();
-			if (mp.getVistit() == -1) {
-
-				mp.setVisit(2);
-
-				if (isMazePoint(mp.getX() - 1, mp.getY()) && (map[mp.getX() - 1][mp.getY()].getType() <= 1)
-						&& map[mp.getX() - 1][mp.getY()].getVistit() == -1) {
-					queue.add(map[mp.getX() - 1][mp.getY()]);
-					map[mp.getX() - 1][mp.getY()].setFiretime(map[mp.getX()][mp.getY()].getFiretime() + 1);
+			for (int i = 0; i < 4; i++) {
+				int nextX = mp.getX() + direction[i][0];
+				int nextY = mp.getY() + direction[i][1];
+				if (isMazePoint(nextX, nextY) && map[nextX][nextY].getType() <= 1
+						&& map[nextX][nextY].getVistit() == -1) {
+					map[nextX][nextY].setVisit(2);
+					queue.add(map[nextX][nextY]);
+					map[nextX][nextY].setFiretime(mp.getFiretime() + 1);
 				}
-				if (isMazePoint(mp.getX(), mp.getY() - 1) && (map[mp.getX()][mp.getY() - 1].getType() <= 1)
-						&& map[mp.getX()][mp.getY() - 1].getVistit() == -1) {
-					queue.add(map[mp.getX()][mp.getY() - 1]);
-					map[mp.getX()][mp.getY() - 1].setFiretime(map[mp.getX()][mp.getY()].getFiretime() + 1);
-				}
-				if (isMazePoint(mp.getX() + 1, mp.getY()) && (map[mp.getX() + 1][mp.getY()].getType() <= 1)
-						&& map[mp.getX() + 1][mp.getY()].getVistit() == -1) {
-					queue.add(map[mp.getX() + 1][mp.getY()]);
-					map[mp.getX() + 1][mp.getY()].setFiretime(map[mp.getX()][mp.getY()].getFiretime() + 1);
-				}
-				if (isMazePoint(mp.getX(), mp.getY() + 1) && (map[mp.getX()][mp.getY() + 1].getType() <= 1)
-						&& map[mp.getX()][mp.getY() + 1].getVistit() == -1) {
-					queue.add(map[mp.getX()][mp.getY() + 1]);
-					map[mp.getX()][mp.getY() + 1].setFiretime(map[mp.getX()][mp.getY()].getFiretime() + 1);
-
-				}
-				// System.out.println(mp.getX() + " " + mp.getY() + " : " +
-				// map[mp.getX()][mp.getY()].getFiretime());
 			}
-			// System.out.println(mp.getX() + " " + mp.getY() + " : " +
-			// map[mp.getX()][mp.getY()].getFiretime());
-		}
 
+		}
+		// print(map);
 	}
 
 	public int humanbfs() {
 
 		while (!queue.isEmpty()) {
-
 			MazePoint mp = queue.poll();
 
-			if (mp.getVistit() != 1 && mp.getStep() < map[mp.getX()][mp.getY()].getFiretime()) {
+			if (mp.getStep() < mp.getFiretime()) {
 
-				/*
-				 * System.out.println("step:" + mp.getX() + " " + mp.getY() +
-				 * " : " + map[mp.getX()][mp.getY()].getStep());
-				 * System.out.println( "fire:" + mp.getX() + " " + mp.getY() +
-				 * " : " + map[mp.getX()][mp.getY()].getFiretime());
-				 */
-
-				mp.setVisit(1);
 				if (isEdge(mp.getX(), mp.getY())) {
 					return mp.getStep() + 1;
 				}
-				if (isMazePoint(mp.getX() - 1, mp.getY()) && (map[mp.getX() - 1][mp.getY()].getType() == 0)) {
-					queue.add(map[mp.getX() - 1][mp.getY()]);
-					map[mp.getX() - 1][mp.getY()].setStep(map[mp.getX() - 1][mp.getY()].getStep() + 1);
+				for (int i = 0; i < 4; i++) {
+					int nextX = mp.getX() + direction[i][0];
+					int nextY = mp.getY() + direction[i][1];
+					if (isMazePoint(nextX, nextY) && map[nextX][nextY].getType() == 0
+							&& map[nextX][nextY].getVistit() != 1) {
+						map[nextX][nextY].setVisit(1);
+						queue.add(map[nextX][nextY]);
+						map[nextX][nextY].setStep(mp.getStep() + 1);
 
-				}
-				if (isMazePoint(mp.getX(), mp.getY() - 1) && (map[mp.getX()][mp.getY() - 1].getType() == 0)) {
-					queue.add(map[mp.getX()][mp.getY() - 1]);
-					map[mp.getX()][mp.getY() - 1].setStep(map[mp.getX()][mp.getY()].getStep() + 1);
-
-				}
-				if (isMazePoint(mp.getX() + 1, mp.getY()) && (map[mp.getX() + 1][mp.getY()].getType() == 0)) {
-					queue.add(map[mp.getX() + 1][mp.getY()]);
-					map[mp.getX() + 1][mp.getY()].setStep(map[mp.getX()][mp.getY()].getStep() + 1);
-
-				}
-				if (isMazePoint(mp.getX(), mp.getY() + 1) && (map[mp.getX()][mp.getY() + 1].getType() == 0)) {
-					queue.add(map[mp.getX()][mp.getY() + 1]);
-					map[mp.getX()][mp.getY() + 1].setStep(map[mp.getX()][mp.getY()].getStep() + 1);
+					}
 				}
 
 			}
@@ -104,19 +74,80 @@ public class MazewithFire {
 		return -1;
 	}
 
-	public static void main(String[] args) {
+	// print for debug
+	public static void print(int[][] map) {
+		for (int i = 0; i < map.length; i++) {
+			for (int j = 0; j < map.length; j++) {
+				System.out.print(map[i][j] + " ");
+			}
+			System.out.println();
+		}
+	}
 
-		int[][] n = { { 3, 3, 3, 3 }, { 3, 1, 2, 3 }, { 3, 0, 0, 3 }, { 3, 0, 0, 3 } };
+	public static void print(MazePoint[][] map) {
+		for (int i = 0; i < map.length; i++) {
+			for (int j = 0; j < map.length; j++) {
+				System.out.print(map[i][j].getFiretime() + " ");
+			}
+			System.out.println();
+		}
+	}
 
-		MazewithFire mf = new MazewithFire(n);
+	public static void main(String[] args) throws FileNotFoundException {
+		long startTime = System.currentTimeMillis();
 
-		MazePoint mpfire = new MazePoint(1, 2, 2);
-		mf.queue.add(mpfire);
-		mf.firebfs();
-		MazePoint mphuman = new MazePoint(1, 1, 1);
-		mf.queue.add(mphuman);
-		int a = mf.humanbfs();
-		System.out.print(a);
+		Scanner sc = new Scanner(new FileInputStream("MazeWithFireTestcase.txt"));
+		int casenumber = sc.nextInt();
+		for (int i = 0; i < casenumber; i++) {
+			int row = sc.nextInt();
+			int column = sc.nextInt();
+			int[][] maps = new int[row][column];
+			sc.nextLine();
+			for (int j = 0; j < row; j++) {
+				char[] temprow = sc.nextLine().toCharArray();
+				for (int m = 0; m < column; m++) {
+					switch (temprow[m]) {
+					case '.':
+						maps[j][m] = 0;
+						break;
+					case 'J':
+						maps[j][m] = 1;
+						break;
+					case 'F':
+						maps[j][m] = 2;
+						break;
+					case '#':
+						maps[j][m] = 3;
+						break;
+					}
+				}
+			}
+			MazewithFire mf = new MazewithFire(maps);
+			for (int r = 0; r < row; r++) {
+				for (int c = 0; c < column; c++) {
+					if (maps[r][c] == 2) {
+						mf.queue.add(map[r][c]);
+					}
+				}
+			}
+
+			mf.firebfs();
+			for (int r = 0; r < row; r++) {
+				for (int c = 0; c < column; c++) {
+					if (maps[r][c] == 1) {
+						MazePoint mphuman = new MazePoint(r, c, 1);
+						mf.queue.add(mphuman);
+						break;
+					}
+				}
+			}
+
+			int a = mf.humanbfs();
+			System.out.println("#" + a);
+		}
+
+		long endTime = System.currentTimeMillis();
+		System.out.println("程序运行时间：" + (endTime - startTime) + "ms");
 	}
 }
 
@@ -134,7 +165,7 @@ class MazePoint {
 		// 0 能走 1 人 2 火 3 墙
 		this.type = type;
 		this.visited = -1;
-		this.firetime = 0;
+		this.firetime = Integer.MAX_VALUE;
 		this.step = 0;
 	}
 
