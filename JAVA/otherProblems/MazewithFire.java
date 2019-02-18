@@ -1,3 +1,5 @@
+// maze with fire problem, use bfs search twice, once for all firepoints ,record the fire reach time for each position. And the other for human, if steps less than fire time, then it can be visited. Firepoints first
+
 package algorithm;
 
 import java.io.FileInputStream;
